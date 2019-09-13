@@ -1,17 +1,25 @@
-<button id="pay">Pay</button>
+<div class="container">
+  <div class="row py-4">
+    <div class="col-md-3"><%= image_tag @order.teddy.photo_url, width: '100%' %></div>
+    <div class="col">
+      <h1>Checkout summary</h1>
+      <p>Purchase of <strong><%= @order.teddy.name %></strong> for <strong><%= humanized_money_with_symbol @order.amount %></strong></p>
+      <button id="pay"
+              class="btn btn-primary"
+              data-stripe-publishable-key="<%= ENV['STRIPE_PUBLISHABLE_KEY'] %>"
+              data-checkout-session-id="<%= @order.checkout_session_id %>">
+        Pay
+      </button>
+    </div>
+  </div>
+</div>
 <script src="https://js.stripe.com/v3/"></script>
 <script>
-  const stripe = Stripe('<%= ENV['STRIPE_PUBLISHABLE_KEY'] %>')
-  document.getElementById('pay').addEventListener('click', () => {
+  const paymentButton = document.getElementById('pay');
+  paymentButton.addEventListener('click', () => {
+    const stripe = Stripe('<%= ENV['STRIPE_PUBLISHABLE_KEY'] %>');
     stripe.redirectToCheckout({
-      // Make the id field from the Checkout Session creation API response
-      // available to this file, so you can provide it as parameter here
-      // instead of the {{CHECKOUT_SESSION_ID}} placeholder.
-      sessionId: '<%= @session.id %>'
-    }).then(function (result) {
-      // If `redirectToCheckout` fails due to a browser or network
-      // error, display the localized error message to your customer
-      // using `result.error.message`.
+      sessionId: '<%= @order.checkout_session_id %>'
     });
   });
 </script>
