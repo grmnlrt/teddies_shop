@@ -1,17 +1,17 @@
-<h1>Purchase of teddy <%= @order.teddy_sku %></h1>
-<%= form_tag order_payments_path(@order) do %>
-  <article>
-    <label class="amount">
-      <span>Amount: <%= humanized_money_with_symbol(@order.amount) %></span>
-    </label>
-  </article>
-
-  <script src="https://checkout.stripe.com/checkout.js" class="stripe-button"
-    data-key="<%= Rails.configuration.stripe[:publishable_key] %>"
-    data-name="My Teddy"
-    data-email="<%= current_user.email %>"
-    data-description="Teddy <%= @order.teddy_sku %>"
-    data-amount="<%= @order.amount_cents %>"
-    data-currency="<%= @order.amount.currency %>"></script>
-
-<% end %>
+<button id="pay">Pay</button>
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+  const stripe = Stripe('<%= ENV['STRIPE_PUBLISHABLE_KEY'] %>')
+  document.getElementById('pay').addEventListener('click', () => {
+    stripe.redirectToCheckout({
+      // Make the id field from the Checkout Session creation API response
+      // available to this file, so you can provide it as parameter here
+      // instead of the {{CHECKOUT_SESSION_ID}} placeholder.
+      sessionId: '<%= @session.id %>'
+    }).then(function (result) {
+      // If `redirectToCheckout` fails due to a browser or network
+      // error, display the localized error message to your customer
+      // using `result.error.message`.
+    });
+  });
+</script>
